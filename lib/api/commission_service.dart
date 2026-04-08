@@ -9,18 +9,28 @@ class CommissionService {
     return CommissionConfig.fromJson(response.data);
   }
 
-  Future<void> updateOrgCommission(String orgId, Map<String, dynamic> data) async {
+  Future<void> updateOrgCommission(
+    String orgId,
+    Map<String, dynamic> data,
+  ) async {
     await _apiClient.patch('/commission/config/$orgId', data: data);
   }
 
-  Future<Map<String, dynamic>> getAgentCommission(String agentId, String orgId) async {
-    final response = await _apiClient.get('/commission/agent/$agentId', queryParameters: {
-      'organizationId': orgId,
-    });
+  Future<Map<String, dynamic>> getAgentCommission(
+    String agentId,
+    String orgId,
+  ) async {
+    final response = await _apiClient.get(
+      '/commission/agent/$agentId',
+      queryParameters: {'organizationId': orgId},
+    );
     return response.data;
   }
 
-  Future<void> updateAgentCommission(String agentId, Map<String, dynamic> data) async {
+  Future<void> updateAgentCommission(
+    String agentId,
+    Map<String, dynamic> data,
+  ) async {
     await _apiClient.patch('/commission/agent/$agentId', data: data);
   }
 }

@@ -92,18 +92,6 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppTheme.backgroundColor,
-        elevation: 0,
-        title: Text(
-          tabs[_currentIndex].label,
-          style: AppTheme.lightTheme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: true,
-      ),
       drawer: _buildDrawer(context, auth),
       body: IndexedStack(
         index: _currentIndex,
@@ -154,79 +142,206 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildDrawer(BuildContext context, AuthProvider auth) {
+    final theme = Theme.of(context);
     final user = auth.user;
-    final userName = user != null ? '${user['firstName']} ${user['lastName']}' : 'User';
+    final userName = user != null
+        ? '${user['firstName']} ${user['lastName']}'
+        : 'Consultant';
     final userEmail = user != null ? user['email'] : '';
+    final initials = userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'C';
 
     return Drawer(
       backgroundColor: AppTheme.backgroundColor,
+      elevation: 0,
+      width: MediaQuery.of(context).size.width * 0.85,
       child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: AppTheme.primaryColor),
-            accountName: Text(userName),
-            accountEmail: Text(userEmail),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Text(
-                userName.substring(0, 1).toUpperCase(),
-                style: const TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
-              ),
+          // Header Section
+          Container(
+            padding: const EdgeInsets.fromLTRB(28, 64, 28, 32),
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor,
+                    borderRadius: BorderRadius.circular(4), // Archictectural corner
+                  ),
+                  child: Center(
+                    child: Text(
+                      initials,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        userName,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        userEmail,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          if (auth.hasPermission('TASKS_VIEW'))
-            ListTile(
-              leading: const Icon(LucideIcons.checkCircle2),
-              title: const Text('Tasks'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const TasksListScreen()),
-                );
-              },
-            ),
-          if (auth.hasPermission('PAYOUTS_VIEW'))
-            ListTile(
-              leading: const Icon(LucideIcons.dollarSign),
-              title: const Text('Financials'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const PayoutsScreen()),
-                );
-              },
-            ),
-          if (auth.hasPermission('ORG_SETTINGS_EDIT'))
-            ListTile(
-              leading: const Icon(LucideIcons.settings),
-              title: const Text('Organization Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const OrganizationSettingsScreen()),
-                );
-              },
-            ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(LucideIcons.user),
-            title: const Text('My Profile'),
-            onTap: () {
-              Navigator.pop(context);
-              // Navigation logic for Profile
-            },
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 28.0),
+            child: Divider(height: 1, color: AppTheme.surfaceContainer),
           ),
-          const Spacer(),
-          ListTile(
-            leading: const Icon(LucideIcons.logOut, color: AppTheme.errorColor),
-            title: const Text('Logout', style: TextStyle(color: AppTheme.errorColor)),
-            onTap: () => auth.logout(),
+          const SizedBox(height: 24),
+
+          // Menu Section
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                if (auth.hasPermission('TASKS_VIEW'))
+                  _buildDrawerItem(
+                    context,
+                    icon: LucideIcons.calendarCheck,
+                    label: 'Workflow Tasks',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TasksListScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                if (auth.hasPermission('PAYOUTS_VIEW'))
+                  _buildDrawerItem(
+                    context,
+                    icon: LucideIcons.banknote,
+                    label: 'Financial Performance',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PayoutsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                if (auth.hasPermission('ORG_SETTINGS_EDIT'))
+                  _buildDrawerItem(
+                    context,
+                    icon: LucideIcons.building,
+                    label: 'Organization Settings',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const OrganizationSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  child: Divider(height: 1, color: AppTheme.surfaceContainer),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: LucideIcons.userCircle,
+                  label: 'Personal Curation',
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Add Profile implementation
+                  },
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 20),
+
+          // Footer Section
+          Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: Column(
+              children: [
+                _buildDrawerItem(
+                  context,
+                  icon: LucideIcons.logOut,
+                  label: 'Sign Out',
+                  isDestructive: true,
+                  onTap: () => auth.logout(),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'ESTATEHUB v1.0',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    letterSpacing: 2.0,
+                    color: AppTheme.onSurfaceVariant.withValues(alpha: 0.4),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+    bool isSelected = false,
+  }) {
+    final theme = Theme.of(context);
+    final color = isDestructive
+        ? AppTheme.errorColor
+        : isSelected
+            ? AppTheme.primaryColor
+            : AppTheme.onSurfaceVariant;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      child: ListTile(
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+        leading: Icon(icon, size: 20, color: color.withValues(alpha: isSelected ? 1 : 0.7)),
+        title: Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: color,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            letterSpacing: 0.3,
+          ),
+        ),
+        tileColor: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.05) : null,
       ),
     );
   }

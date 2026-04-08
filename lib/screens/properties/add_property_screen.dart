@@ -17,7 +17,7 @@ class AddPropertyScreen extends StatefulWidget {
 class _AddPropertyScreenState extends State<AddPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
   final _picker = ImagePicker();
-  
+
   // Form fields
   String _title = '';
   String _description = '';
@@ -35,13 +35,24 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   bool _isSubmitting = false;
 
   final List<String> _propertyTypes = [
-    'APARTMENT', 'HOUSE', 'VILLA', 'OFFICE', 'SHOP', 'LAND', 'WAREHOUSE', 'BUILDING'
+    'APARTMENT',
+    'HOUSE',
+    'VILLA',
+    'OFFICE',
+    'SHOP',
+    'LAND',
+    'WAREHOUSE',
+    'BUILDING',
   ];
 
   final List<String> _listingTypes = ['SALE', 'RENT', 'LEASE'];
-  
+
   final List<String> _propertyStatuses = [
-    'AVAILABLE', 'RESERVED', 'SOLD', 'RENTED', 'OFF_MARKET'
+    'AVAILABLE',
+    'RESERVED',
+    'SOLD',
+    'RENTED',
+    'OFF_MARKET',
   ];
 
   Future<void> _pickImages() async {
@@ -64,7 +75,10 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
     _formKey.currentState!.save();
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    final propertiesProvider = Provider.of<PropertiesProvider>(context, listen: false);
+    final propertiesProvider = Provider.of<PropertiesProvider>(
+      context,
+      listen: false,
+    );
     final orgId = auth.currentOrganizationId;
 
     if (orgId == null) return;
@@ -91,7 +105,11 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
 
       // Upload images after creation
       for (final image in _selectedImages) {
-        await propertiesProvider.uploadPropertyImage(newProperty.id, image.path, orgId);
+        await propertiesProvider.uploadPropertyImage(
+          newProperty.id,
+          image.path,
+          orgId,
+        );
       }
 
       if (mounted) {
@@ -102,9 +120,9 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -126,7 +144,9 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
         ),
         title: Text(
           'Add Property',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           if (_isSubmitting)
@@ -136,7 +156,10 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 child: SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryColor),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppTheme.primaryColor,
+                  ),
                 ),
               ),
             )
@@ -163,7 +186,9 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
               // Image Picker Section
               Text(
                 'Property Images',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -181,9 +206,14 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceLift,
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppTheme.surfaceContainer),
+                            border: Border.all(
+                              color: AppTheme.surfaceContainer,
+                            ),
                           ),
-                          child: const Icon(LucideIcons.plus, color: AppTheme.onSurfaceVariant),
+                          child: const Icon(
+                            LucideIcons.plus,
+                            color: AppTheme.onSurfaceVariant,
+                          ),
                         ),
                       );
                     }
@@ -195,7 +225,9 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4),
                             image: DecorationImage(
-                              image: FileImage(File(_selectedImages[index].path)),
+                              image: FileImage(
+                                File(_selectedImages[index].path),
+                              ),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -211,7 +243,11 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                                 color: Colors.black54,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(LucideIcons.trash2, size: 14, color: Colors.white),
+                              child: const Icon(
+                                LucideIcons.trash2,
+                                size: 14,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -227,7 +263,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
               _buildTextField(
                 label: 'Title',
                 onSaved: (val) => _title = val ?? '',
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Required' : null,
               ),
               _buildTextField(
                 label: 'Description',
@@ -267,7 +304,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
               _buildTextField(
                 label: 'Address',
                 onSaved: (val) => _address = val ?? '',
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Required' : null,
               ),
 
               const SizedBox(height: 24),

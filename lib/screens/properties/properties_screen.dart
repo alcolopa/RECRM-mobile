@@ -64,10 +64,14 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           ? FloatingActionButton(
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddPropertyScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const AddPropertyScreen(),
+                ),
               ),
               backgroundColor: AppTheme.primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
               child: const Icon(LucideIcons.plus, color: Colors.white),
             )
           : null,
@@ -112,6 +116,10 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 ),
                 const SizedBox(width: 8),
               ],
+              leading: IconButton(
+                icon: const Icon(LucideIcons.menu, color: AppTheme.primaryColor),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
             ),
             Consumer<PropertiesProvider>(
               builder: (context, provider, child) {

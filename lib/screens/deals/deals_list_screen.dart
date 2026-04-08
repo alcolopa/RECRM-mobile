@@ -39,55 +39,84 @@ class _DealsListScreenState extends State<DealsListScreen> {
     final filteredDeals = dealsProvider.deals.where((deal) {
       final query = _searchQuery.toLowerCase();
       final matchesQuery = deal.title.toLowerCase().contains(query);
-      
-      final matchesStage = _selectedStage == null || deal.stage == _selectedStage;
+
+      final matchesStage =
+          _selectedStage == null || deal.stage == _selectedStage;
 
       return matchesQuery && matchesStage;
     }).toList();
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search Deals...',
-                      prefixIcon: const Icon(LucideIcons.search, size: 20),
-                      filled: true,
-                      fillColor: AppTheme.surfaceLift,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 120.0,
+            floating: true,
+            pinned: true,
+            backgroundColor: AppTheme.backgroundColor,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(LucideIcons.menu, color: AppTheme.primaryColor),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ),
+              title: Text(
+                'Deals',
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceLift,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      LucideIcons.filter, 
-                      size: 20, 
-                      color: _selectedStage != null ? AppTheme.primaryColor : AppTheme.onSurfaceVariant
-                    ),
-                    onPressed: _showFilterMenu,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-          Expanded(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search deals...',
+                        prefixIcon: const Icon(LucideIcons.search, size: 20),
+                        filled: true,
+                        fillColor: AppTheme.surfaceLift,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onChanged: (value) => setState(() => _searchQuery = value),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceLift,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        LucideIcons.filter,
+                        size: 20,
+                        color: _selectedStage != null
+                            ? AppTheme.primaryColor
+                            : AppTheme.onSurfaceVariant,
+                      ),
+                      onPressed: _showFilterMenu,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverFillRemaining(
             child: _buildDealsList(dealsProvider, filteredDeals),
           ),
         ],
@@ -109,14 +138,19 @@ class _DealsListScreenState extends State<DealsListScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.backgroundColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Filter by Stage', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Filter by Stage',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             _filterOption(null, 'All Stages'),
             _filterOption('DISCOVERY', 'Discovery'),
@@ -135,7 +169,9 @@ class _DealsListScreenState extends State<DealsListScreen> {
     final isSelected = _selectedStage == value;
     return ListTile(
       title: Text(label),
-      trailing: isSelected ? const Icon(LucideIcons.check, color: AppTheme.primaryColor) : null,
+      trailing: isSelected
+          ? const Icon(LucideIcons.check, color: AppTheme.primaryColor)
+          : null,
       onTap: () {
         setState(() => _selectedStage = value);
         Navigator.pop(context);
@@ -153,7 +189,11 @@ class _DealsListScreenState extends State<DealsListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(LucideIcons.alertTriangle, size: 48, color: AppTheme.errorColor),
+            const Icon(
+              LucideIcons.alertTriangle,
+              size: 48,
+              color: AppTheme.errorColor,
+            ),
             const SizedBox(height: 16),
             Text('Error loading deals: ${provider.errorMessage}'),
             TextButton(
@@ -171,9 +211,7 @@ class _DealsListScreenState extends State<DealsListScreen> {
     }
 
     if (deals.isEmpty) {
-      return const Center(
-        child: Text('No deals found.'),
-      );
+      return const Center(child: Text('No deals found.'));
     }
 
     return RefreshIndicator(
@@ -193,7 +231,9 @@ class _DealsListScreenState extends State<DealsListScreen> {
             elevation: 0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1)),
+              side: BorderSide(
+                color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1),
+              ),
             ),
             color: AppTheme.surfaceLift,
             child: ListTile(
@@ -218,16 +258,26 @@ class _DealsListScreenState extends State<DealsListScreen> {
                   if (deal.value != null)
                     Text(
                       '\$${deal.value.toStringAsFixed(0)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryColor,
+                      ),
                     ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(LucideIcons.calendar, size: 12, color: AppTheme.onSurfaceVariant),
+                      const Icon(
+                        LucideIcons.calendar,
+                        size: 12,
+                        color: AppTheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Updated ${deal.updatedAt.day}/${deal.updatedAt.month}',
-                        style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceVariant),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -235,7 +285,9 @@ class _DealsListScreenState extends State<DealsListScreen> {
               ),
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DealDetailScreen(dealId: deal.id)),
+                MaterialPageRoute(
+                  builder: (context) => DealDetailScreen(dealId: deal.id),
+                ),
               ),
             ),
           );

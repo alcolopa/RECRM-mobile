@@ -6,7 +6,7 @@ enum DealsStatus { initial, loading, loaded, error }
 
 class DealsProvider with ChangeNotifier {
   final DealsService _service = DealsService();
-  
+
   List<Deal> _deals = [];
   DealsStatus _status = DealsStatus.initial;
   String? _errorMessage;
@@ -44,7 +44,11 @@ class DealsProvider with ChangeNotifier {
     }
   }
 
-  Future<Deal> updateDeal(String id, String organizationId, Map<String, dynamic> data) async {
+  Future<Deal> updateDeal(
+    String id,
+    String organizationId,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final deal = await _service.updateDeal(id, organizationId, data);
       final index = _deals.indexWhere((d) => d.id == id);

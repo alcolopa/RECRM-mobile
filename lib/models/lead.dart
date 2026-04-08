@@ -55,8 +55,8 @@ class Lead {
       organizationId: json['organizationId'],
       assignedUserId: json['assignedUserId'],
       budget: json['budget']?.toString(),
-      convertedAt: json['convertedAt'] != null 
-          ? DateTime.parse(json['convertedAt']) 
+      convertedAt: json['convertedAt'] != null
+          ? DateTime.parse(json['convertedAt'])
           : null,
       convertedContactId: json['convertedContactId'],
       notes: json['notes'],

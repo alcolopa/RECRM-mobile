@@ -9,7 +9,7 @@ enum AuthStatus { unknown, authenticated, unauthenticated, authenticating }
 class AuthProvider extends ChangeNotifier {
   final ApiClient _apiClient = ApiClient();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  
+
   AuthStatus _status = AuthStatus.unknown;
   Map<String, dynamic>? _user;
   Organization? _organization;
@@ -35,7 +35,7 @@ class AuthProvider extends ChangeNotifier {
         _status = AuthStatus.unauthenticated;
         await _storage.delete(key: 'auth_token');
       }
-      
+
       // Fetch organization once authenticated
       if (_status == AuthStatus.authenticated) {
         await fetchOrganization();
@@ -52,14 +52,14 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiClient.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await _apiClient.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
 
       final token = response.data['access_token'];
       await _storage.write(key: 'auth_token', value: token);
-      
+
       // Re-fetch profile to get user details
       await _checkStatus();
       return true;
@@ -67,9 +67,15 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.unauthenticated;
       if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
         if (e.response?.data is Map) {
-          _errors = Map<String, String>.from(e.response?.data.map((key, value) => MapEntry(key, value.toString())));
+          _errors = Map<String, String>.from(
+            e.response?.data.map(
+              (key, value) => MapEntry(key, value.toString()),
+            ),
+          );
         } else {
-          _errors = {'message': e.response?.data['message'] ?? 'Invalid credentials'};
+          _errors = {
+            'message': e.response?.data['message'] ?? 'Invalid credentials',
+          };
         }
       } else {
         _errors = {'message': 'Connection error. Please try again.'};
@@ -93,17 +99,23 @@ class AuthProvider extends ChangeNotifier {
       final response = await _apiClient.post('/auth/register', data: userData);
       final token = response.data['access_token'];
       await _storage.write(key: 'auth_token', value: token);
-      
+
       await _checkStatus();
       return true;
     } on DioException catch (e) {
       _status = AuthStatus.unauthenticated;
       if (e.response?.statusCode == 400 || e.response?.statusCode == 409) {
         if (e.response?.data is Map) {
-           // NestJS global validation pipe returns a "bag of errors" as per GEMINI.md
-           _errors = Map<String, String>.from(e.response?.data.map((key, value) => MapEntry(key, value.toString())));
+          // NestJS global validation pipe returns a "bag of errors" as per GEMINI.md
+          _errors = Map<String, String>.from(
+            e.response?.data.map(
+              (key, value) => MapEntry(key, value.toString()),
+            ),
+          );
         } else {
-          _errors = {'message': e.response?.data['message'] ?? 'Registration failed'};
+          _errors = {
+            'message': e.response?.data['message'] ?? 'Registration failed',
+          };
         }
       } else {
         _errors = {'message': 'Connection error. Please try again.'};
@@ -138,7 +150,7 @@ class AuthProvider extends ChangeNotifier {
     if (_user == null || _user!['memberships'] == null) return false;
     final List memberships = _user!['memberships'];
     final orgId = currentOrganizationId;
-    
+
     final membership = memberships.firstWhere(
       (m) => m['organizationId'] == orgId,
       orElse: () => null,
@@ -149,7 +161,8 @@ class AuthProvider extends ChangeNotifier {
     final String role = membership['role'];
     if (role == 'OWNER' || role == 'ADMIN') return true;
 
-    if (membership['customRole'] != null && membership['customRole']['permissions'] != null) {
+    if (membership['customRole'] != null &&
+        membership['customRole']['permissions'] != null) {
       final List permissions = membership['customRole']['permissions'];
       return permissions.contains(permission);
     }
@@ -162,7 +175,10 @@ class AuthProvider extends ChangeNotifier {
     if (orgId == null) return;
 
     try {
-      final response = await _apiClient.get('/organization', queryParameters: {'organizationId': orgId});
+      final response = await _apiClient.get(
+        '/organization',
+        queryParameters: {'organizationId': orgId},
+      );
       _organization = Organization.fromJson(response.data);
       notifyListeners();
     } catch (e) {
@@ -175,16 +191,19 @@ class AuthProvider extends ChangeNotifier {
     if (orgId == null) return false;
 
     try {
-      final response = await _apiClient.patch('/organization', 
+      final response = await _apiClient.patch(
+        '/organization',
         data: data,
-        queryParameters: {'organizationId': orgId}
+        queryParameters: {'organizationId': orgId},
       );
       _organization = Organization.fromJson(response.data);
       notifyListeners();
       return true;
     } on DioException catch (e) {
       if (e.response?.data is Map) {
-         _errors = Map<String, String>.from(e.response?.data.map((key, value) => MapEntry(key, value.toString())));
+        _errors = Map<String, String>.from(
+          e.response?.data.map((key, value) => MapEntry(key, value.toString())),
+        );
       }
       notifyListeners();
       return false;
@@ -213,6 +232,142 @@ class AuthProvider extends ChangeNotifier {
         subscription: _organization!.subscription,
       );
       notifyListeners();
+    }
+  }
+
+  // --- New Auth Methods ---
+
+  Future<bool> checkSlugAvailability(String slug) async {
+    try {
+      final response = await _apiClient.get('/auth/check-slug/$slug');
+      return response.data['available'] ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> forgotPassword(String email) async {
+    _errors = null;
+    notifyListeners();
+    try {
+      await _apiClient.post('/auth/forgot-password', data: {'email': email});
+      return true;
+    } on DioException catch (e) {
+      if (e.response?.data is Map) {
+        _errors = Map<String, String>.from(
+          e.response?.data.map((key, value) => MapEntry(key, value.toString())),
+        );
+      } else {
+        _errors = {'message': 'Failed to send reset email'};
+      }
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errors = {'message': 'An unexpected error occurred'};
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(String token, String newPassword) async {
+    _status = AuthStatus.authenticating;
+    _errors = null;
+    notifyListeners();
+    try {
+      await _apiClient.post(
+        '/auth/reset-password',
+        data: {'token': token, 'newPassword': newPassword},
+      );
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return true;
+    } on DioException catch (e) {
+      _status = AuthStatus.unauthenticated;
+      if (e.response?.data is Map) {
+        _errors = Map<String, String>.from(
+          e.response?.data.map((key, value) => MapEntry(key, value.toString())),
+        );
+      } else {
+        _errors = {'message': 'Failed to reset password'};
+      }
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _status = AuthStatus.unauthenticated;
+      _errors = {'message': 'An unexpected error occurred'};
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> verifyInvitation(String token) async {
+    try {
+      final response = await _apiClient.get('/auth/invite/verify/$token');
+      return response.data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> acceptInvitation(String token) async {
+    _status = AuthStatus.authenticating;
+    _errors = null;
+    notifyListeners();
+    try {
+      await _apiClient.post('/auth/invite/accept', data: {'token': token});
+      await _checkStatus();
+      return true;
+    } on DioException catch (e) {
+      _status = AuthStatus.authenticated; // We were already logged in
+      if (e.response?.data is Map) {
+        _errors = Map<String, String>.from(
+          e.response?.data.map((key, value) => MapEntry(key, value.toString())),
+        );
+      } else {
+        _errors = {'message': 'Failed to accept invitation'};
+      }
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _status = AuthStatus.authenticated;
+      _errors = {'message': 'An unexpected error occurred'};
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> registerWithInvitation(
+    String token,
+    Map<String, dynamic> userData,
+  ) async {
+    _status = AuthStatus.authenticating;
+    _errors = null;
+    notifyListeners();
+    try {
+      final response = await _apiClient.post(
+        '/auth/invite/register',
+        data: {'token': token, 'userData': userData},
+      );
+      final accessToken = response.data['access_token'];
+      await _storage.write(key: 'auth_token', value: accessToken);
+      await _checkStatus();
+      return true;
+    } on DioException catch (e) {
+      _status = AuthStatus.unauthenticated;
+      if (e.response?.data is Map) {
+        _errors = Map<String, String>.from(
+          e.response?.data.map((key, value) => MapEntry(key, value.toString())),
+        );
+      } else {
+        _errors = {'message': 'Join failed'};
+      }
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _status = AuthStatus.unauthenticated;
+      _errors = {'message': 'An unexpected error occurred'};
+      notifyListeners();
+      return false;
     }
   }
 }

@@ -71,12 +71,20 @@ class Property {
       city: json['city'],
       state: json['state'],
       zipCode: json['zipCode'],
-      price: json['price'] != null ? double.tryParse(json['price'].toString()) : null,
+      price: json['price'] != null
+          ? double.tryParse(json['price'].toString())
+          : null,
       currency: json['currency'] ?? 'USD',
       bedrooms: json['bedrooms'],
-      bathrooms: json['bathrooms'] != null ? double.tryParse(json['bathrooms'].toString()) : null,
-      area: json['area'] != null ? double.tryParse(json['area'].toString()) : null,
-      sizeSqm: json['sizeSqm'] != null ? double.tryParse(json['sizeSqm'].toString()) : null,
+      bathrooms: json['bathrooms'] != null
+          ? double.tryParse(json['bathrooms'].toString())
+          : null,
+      area: json['area'] != null
+          ? double.tryParse(json['area'].toString())
+          : null,
+      sizeSqm: json['sizeSqm'] != null
+          ? double.tryParse(json['sizeSqm'].toString())
+          : null,
       status: json['status'] ?? 'AVAILABLE',
       listingType: json['listingType'] ?? 'SALE',
       type: json['type'] ?? 'HOUSE',

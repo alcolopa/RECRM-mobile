@@ -30,7 +30,7 @@ class EntitySelector<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = selectedValue;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -76,7 +76,9 @@ class EntitySelector<T> extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             color: selected == null
-                                ? AppTheme.onSurfaceVariant.withValues(alpha: 0.5)
+                                ? AppTheme.onSurfaceVariant.withValues(
+                                    alpha: 0.5,
+                                  )
                                 : AppTheme.onSurface,
                           ),
                           maxLines: 1,
@@ -96,10 +98,7 @@ class EntitySelector<T> extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             errorText!,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: AppTheme.errorColor,
-            ),
+            style: GoogleFonts.inter(fontSize: 12, color: AppTheme.errorColor),
           ),
         ],
       ],
@@ -146,7 +145,8 @@ class _EntitySelectionSheet<T> extends StatefulWidget {
   });
 
   @override
-  State<_EntitySelectionSheet<T>> createState() => _EntitySelectionSheetState<T>();
+  State<_EntitySelectionSheet<T>> createState() =>
+      _EntitySelectionSheetState<T>();
 }
 
 class _EntitySelectionSheetState<T> extends State<_EntitySelectionSheet<T>> {
@@ -162,8 +162,12 @@ class _EntitySelectionSheetState<T> extends State<_EntitySelectionSheet<T>> {
   void _filterItems(String query) {
     setState(() {
       filteredItems = widget.items
-          .where((item) =>
-              widget.displayLabel(item).toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (item) => widget
+                .displayLabel(item)
+                .toLowerCase()
+                .contains(query.toLowerCase()),
+          )
           .toList();
     });
   }

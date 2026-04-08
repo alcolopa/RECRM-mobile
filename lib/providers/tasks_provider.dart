@@ -6,7 +6,7 @@ enum TasksStatus { initial, loading, loaded, error }
 
 class TasksProvider with ChangeNotifier {
   final TasksService _service = TasksService();
-  
+
   List<CRMTask> _tasks = [];
   TasksStatus _status = TasksStatus.initial;
   String? _errorMessage;
@@ -15,12 +15,20 @@ class TasksProvider with ChangeNotifier {
   TasksStatus get status => _status;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchTasks(String organizationId, {String? status, String? priority}) async {
+  Future<void> fetchTasks(
+    String organizationId, {
+    String? status,
+    String? priority,
+  }) async {
     _status = TasksStatus.loading;
     notifyListeners();
 
     try {
-      _tasks = await _service.getTasks(organizationId, status: status, priority: priority);
+      _tasks = await _service.getTasks(
+        organizationId,
+        status: status,
+        priority: priority,
+      );
       _status = TasksStatus.loaded;
       _errorMessage = null;
     } catch (e) {
@@ -44,7 +52,11 @@ class TasksProvider with ChangeNotifier {
     }
   }
 
-  Future<CRMTask> updateTask(String id, String organizationId, Map<String, dynamic> data) async {
+  Future<CRMTask> updateTask(
+    String id,
+    String organizationId,
+    Map<String, dynamic> data,
+  ) async {
     try {
       final task = await _service.updateTask(id, organizationId, data);
       final index = _tasks.indexWhere((t) => t.id == id);

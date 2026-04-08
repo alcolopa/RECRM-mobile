@@ -46,6 +46,10 @@ class DashboardScreen extends StatelessWidget {
                 onPressed: () => auth.logout(),
               ),
             ],
+            leading: IconButton(
+              icon: const Icon(LucideIcons.menu, color: AppTheme.primaryColor),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),

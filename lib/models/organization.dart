@@ -44,8 +44,8 @@ class Organization {
       defaultTheme: json['defaultTheme'] ?? 'LIGHT',
       memberships: json['memberships'] != null
           ? (json['memberships'] as List)
-              .map((i) => Membership.fromJson(i))
-              .toList()
+                .map((i) => Membership.fromJson(i))
+                .toList()
           : null,
       subscription: json['subscription'] != null
           ? Subscription.fromJson(json['subscription'])
@@ -229,7 +229,7 @@ class Subscription {
 class CommissionConfig {
   final String? id;
   final String? organizationId;
-  
+
   // RENT
   final double? rentBuyerValue;
   final String rentBuyerType;

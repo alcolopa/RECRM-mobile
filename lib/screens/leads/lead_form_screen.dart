@@ -18,7 +18,7 @@ class LeadFormScreen extends StatefulWidget {
 
 class _LeadFormScreenState extends State<LeadFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
@@ -27,10 +27,12 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
   late TextEditingController _budgetController;
   late TextEditingController _notesController;
   late TextEditingController _propertyTypeController;
+  late TextEditingController _locationController;
 
   String _status = 'NEW';
   String _intent = 'SALE';
   String? _urgencyLevel;
+  String? _assignedUserId;
 
   bool _isSaving = false;
 
@@ -46,11 +48,13 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
     _budgetController = TextEditingController(text: lead?.budget);
     _notesController = TextEditingController(text: lead?.notes);
     _propertyTypeController = TextEditingController(text: lead?.propertyType);
+    _locationController = TextEditingController(text: lead?.preferredLocation);
 
     if (lead != null) {
       _status = lead.status;
       _intent = lead.intent;
       _urgencyLevel = lead.urgencyLevel;
+      _assignedUserId = lead.assignedUserId;
     }
   }
 
@@ -64,6 +68,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
     _budgetController.dispose();
     _notesController.dispose();
     _propertyTypeController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -79,22 +84,42 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
       final data = {
         'firstName': _firstNameController.text.trim(),
         'lastName': _lastNameController.text.trim(),
-        'email': _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-        'phone': _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
+        'email': _emailController.text.trim().isEmpty
+            ? null
+            : _emailController.text.trim(),
+        'phone': _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
         'status': _status,
-        'source': _sourceController.text.trim().isEmpty ? null : _sourceController.text.trim(),
-        'budget': _budgetController.text.trim().isEmpty ? null : _budgetController.text.trim(),
+        'source': _sourceController.text.trim().isEmpty
+            ? null
+            : _sourceController.text.trim(),
+        'budget': _budgetController.text.trim().isEmpty
+            ? null
+            : _budgetController.text.trim(),
         'intent': _intent,
         'urgencyLevel': _urgencyLevel,
-        'propertyType': _propertyTypeController.text.trim().isEmpty ? null : _propertyTypeController.text.trim(),
-        'notes': _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        'propertyType': _propertyTypeController.text.trim().isEmpty
+            ? null
+            : _propertyTypeController.text.trim(),
+        'preferredLocation': _locationController.text.trim().isEmpty
+            ? null
+            : _locationController.text.trim(),
+        'notes': _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
+        'assignedUserId': _assignedUserId,
         'organizationId': auth.currentOrganizationId,
       };
 
       if (widget.lead == null) {
         await provider.createLead(data);
       } else {
-        await provider.updateLead(widget.lead!.id, auth.currentOrganizationId!, data);
+        await provider.updateLead(
+          widget.lead!.id,
+          auth.currentOrganizationId!,
+          data,
+        );
       }
 
       if (mounted) {
@@ -105,9 +130,9 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving lead: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving lead: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -116,6 +141,15 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<LeadsProvider>();
+    final auth = context.watch<AuthProvider>();
+    final errors = provider.errors;
+
+    final members = auth.organization?.memberships ?? [];
+    final safeSelectedUserId = members.any((m) => m.userId == _assignedUserId)
+        ? _assignedUserId
+        : null;
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
@@ -126,13 +160,23 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             )
           else
             TextButton(
               onPressed: _save,
-              child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+              child: const Text(
+                'SAVE',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
             ),
         ],
       ),
@@ -143,13 +187,16 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildSectionTitle('Basic Info'),
               Row(
                 children: [
                   Expanded(
                     child: CustomTextField(
                       label: 'First Name',
                       controller: _firstNameController,
-                      validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                      errorText: errors?['firstName'],
+                      validator: (value) =>
+                          value == null || value.isEmpty ? 'Required' : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -157,7 +204,9 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
                     child: CustomTextField(
                       label: 'Last Name',
                       controller: _lastNameController,
-                      validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                      errorText: errors?['lastName'],
+                      validator: (value) =>
+                          value == null || value.isEmpty ? 'Required' : null,
                     ),
                   ),
                 ],
@@ -166,6 +215,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
               CustomTextField(
                 label: 'Email',
                 controller: _emailController,
+                errorText: errors?['email'],
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: LucideIcons.mail,
               ),
@@ -173,33 +223,68 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
               CustomTextField(
                 label: 'Phone',
                 controller: _phoneController,
+                errorText: errors?['phone'],
                 keyboardType: TextInputType.phone,
                 prefixIcon: LucideIcons.phone,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+              _buildSectionTitle('Lead Status & Assignment'),
               CustomDropdown<String>(
                 label: 'Status',
                 value: _status,
+                errorText: errors?['status'],
                 items: const [
                   DropdownMenuItem(value: 'NEW', child: Text('New')),
-                  DropdownMenuItem(value: 'CONTACTED', child: Text('Contacted')),
-                  DropdownMenuItem(value: 'QUALIFIED', child: Text('Qualified')),
-                  DropdownMenuItem(value: 'PROPOSAL_SENT', child: Text('Proposal Sent')),
-                  DropdownMenuItem(value: 'NEGOTIATION', child: Text('Negotiation')),
+                  DropdownMenuItem(
+                    value: 'CONTACTED',
+                    child: Text('Contacted'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'QUALIFIED',
+                    child: Text('Qualified'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'PROPOSAL_SENT',
+                    child: Text('Proposal Sent'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'NEGOTIATION',
+                    child: Text('Negotiation'),
+                  ),
                   DropdownMenuItem(value: 'LOST', child: Text('Lost')),
-                  DropdownMenuItem(value: 'CLOSED_WON', child: Text('Closed Won')),
+                  DropdownMenuItem(
+                    value: 'CLOSED_WON',
+                    child: Text('Closed Won'),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) setState(() => _status = value);
                 },
               ),
               const SizedBox(height: 16),
+              CustomDropdown<String?>(
+                label: 'Assigned Agent',
+                value: safeSelectedUserId,
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('Unassigned')),
+                  ...members.map(
+                    (m) => DropdownMenuItem(
+                      value: m.userId,
+                      child: Text(m.user?.fullName ?? 'Unknown'),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _assignedUserId = value),
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle('Requirements'),
               Row(
                 children: [
                   Expanded(
                     child: CustomDropdown<String>(
                       label: 'Intent',
                       value: _intent,
+                      errorText: errors?['intent'],
                       items: const [
                         DropdownMenuItem(value: 'SALE', child: Text('Sale')),
                         DropdownMenuItem(value: 'RENT', child: Text('Rent')),
@@ -214,10 +299,14 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
                     child: CustomDropdown<String>(
                       label: 'Urgency',
                       value: _urgencyLevel,
+                      errorText: errors?['urgencyLevel'],
                       items: const [
                         DropdownMenuItem(value: null, child: Text('Not Set')),
                         DropdownMenuItem(value: 'LOW', child: Text('Low')),
-                        DropdownMenuItem(value: 'MEDIUM', child: Text('Medium')),
+                        DropdownMenuItem(
+                          value: 'MEDIUM',
+                          child: Text('Medium'),
+                        ),
                         DropdownMenuItem(value: 'HIGH', child: Text('High')),
                       ],
                       onChanged: (value) {
@@ -234,6 +323,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
                     child: CustomTextField(
                       label: 'Budget',
                       controller: _budgetController,
+                      errorText: errors?['budget'],
                       prefixIcon: LucideIcons.dollarSign,
                     ),
                   ),
@@ -242,6 +332,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
                     child: CustomTextField(
                       label: 'Property Type',
                       controller: _propertyTypeController,
+                      errorText: errors?['propertyType'],
                       prefixIcon: LucideIcons.building,
                     ),
                   ),
@@ -249,19 +340,44 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
               ),
               const SizedBox(height: 16),
               CustomTextField(
-                label: 'Source',
-                controller: _sourceController,
-                prefixIcon: LucideIcons.share2,
+                label: 'Preferred Location',
+                controller: _locationController,
+                errorText: errors?['preferredLocation'],
+                prefixIcon: LucideIcons.mapPin,
               ),
               const SizedBox(height: 16),
               CustomTextField(
+                label: 'Source',
+                controller: _sourceController,
+                errorText: errors?['source'],
+                prefixIcon: LucideIcons.share2,
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle('Additional Info'),
+              CustomTextField(
                 label: 'Notes',
                 controller: _notesController,
+                errorText: errors?['notes'],
                 maxLines: 4,
               ),
               const SizedBox(height: 32),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+          color: AppTheme.onSurfaceVariant,
         ),
       ),
     );

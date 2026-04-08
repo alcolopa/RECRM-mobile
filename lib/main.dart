@@ -40,6 +40,8 @@ class MyApp extends StatelessWidget {
       title: 'EstateHub CRM',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const AuthWrapper(),
     );
   }
@@ -54,11 +56,7 @@ class AuthWrapper extends StatelessWidget {
     final authStatus = context.watch<AuthProvider>().status;
 
     if (authStatus == AuthStatus.unknown) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (authStatus == AuthStatus.authenticated) {

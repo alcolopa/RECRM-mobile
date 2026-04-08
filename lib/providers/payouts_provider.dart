@@ -6,7 +6,7 @@ enum PayoutsStatus { initial, loading, loaded, error }
 
 class PayoutsProvider with ChangeNotifier {
   final PayoutsService _service = PayoutsService();
-  
+
   AdminPayoutStats? _adminStats;
   PersonalPayoutStats? _personalStats;
   PayoutsStatus _status = PayoutsStatus.initial;
@@ -17,12 +17,20 @@ class PayoutsProvider with ChangeNotifier {
   PayoutsStatus get status => _status;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchAdminStats(String organizationId, {String? startDate, String? endDate}) async {
+  Future<void> fetchAdminStats(
+    String organizationId, {
+    String? startDate,
+    String? endDate,
+  }) async {
     _status = PayoutsStatus.loading;
     notifyListeners();
 
     try {
-      _adminStats = await _service.getAdminStats(organizationId, startDate: startDate, endDate: endDate);
+      _adminStats = await _service.getAdminStats(
+        organizationId,
+        startDate: startDate,
+        endDate: endDate,
+      );
       _status = PayoutsStatus.loaded;
       _errorMessage = null;
     } catch (e) {
@@ -33,12 +41,20 @@ class PayoutsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPersonalStats(String organizationId, {String? startDate, String? endDate}) async {
+  Future<void> fetchPersonalStats(
+    String organizationId, {
+    String? startDate,
+    String? endDate,
+  }) async {
     _status = PayoutsStatus.loading;
     notifyListeners();
 
     try {
-      _personalStats = await _service.getPersonalStats(organizationId, startDate: startDate, endDate: endDate);
+      _personalStats = await _service.getPersonalStats(
+        organizationId,
+        startDate: startDate,
+        endDate: endDate,
+      );
       _status = PayoutsStatus.loaded;
       _errorMessage = null;
     } catch (e) {

@@ -9,10 +9,7 @@ class PropertiesService {
     try {
       final response = await _apiClient.get(
         '/properties',
-        queryParameters: {
-          'organizationId': organizationId,
-          'limit': 50,
-        },
+        queryParameters: {'organizationId': organizationId, 'limit': 50},
       );
 
       if (response.statusCode == 200) {
@@ -38,7 +35,11 @@ class PropertiesService {
     );
   }
 
-  Future<void> uploadPropertyImage(String propertyId, String filePath, String organizationId) async {
+  Future<void> uploadPropertyImage(
+    String propertyId,
+    String filePath,
+    String organizationId,
+  ) async {
     final formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(filePath),
     });

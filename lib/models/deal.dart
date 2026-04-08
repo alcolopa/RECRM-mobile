@@ -47,7 +47,9 @@ class Deal {
     return Deal(
       id: json['id'],
       title: json['title'],
-      value: json['value'] != null ? double.parse(json['value'].toString()) : null,
+      value: json['value'] != null
+          ? double.parse(json['value'].toString())
+          : null,
       stage: json['stage'],
       organizationId: json['organizationId'],
       contactId: json['contactId'],
@@ -57,15 +59,27 @@ class Deal {
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       type: json['type'] ?? 'SALE',
-      propertyPrice: json['propertyPrice'] != null ? double.parse(json['propertyPrice'].toString()) : null,
-      rentPrice: json['rentPrice'] != null ? double.parse(json['rentPrice'].toString()) : null,
-      buyerCommission: json['buyerCommission'] != null ? double.parse(json['buyerCommission'].toString()) : null,
-      sellerCommission: json['sellerCommission'] != null ? double.parse(json['sellerCommission'].toString()) : null,
-      totalCommission: json['totalCommission'] != null ? double.parse(json['totalCommission'].toString()) : null,
-      agentCommission: json['agentCommission'] != null ? double.parse(json['agentCommission'].toString()) : null,
+      propertyPrice: json['propertyPrice'] != null
+          ? double.parse(json['propertyPrice'].toString())
+          : null,
+      rentPrice: json['rentPrice'] != null
+          ? double.parse(json['rentPrice'].toString())
+          : null,
+      buyerCommission: json['buyerCommission'] != null
+          ? double.parse(json['buyerCommission'].toString())
+          : null,
+      sellerCommission: json['sellerCommission'] != null
+          ? double.parse(json['sellerCommission'].toString())
+          : null,
+      totalCommission: json['totalCommission'] != null
+          ? double.parse(json['totalCommission'].toString())
+          : null,
+      agentCommission: json['agentCommission'] != null
+          ? double.parse(json['agentCommission'].toString())
+          : null,
       isAgentPaid: json['isAgentPaid'] ?? false,
-      agentPaidAt: json['agentPaidAt'] != null 
-          ? DateTime.parse(json['agentPaidAt']) 
+      agentPaidAt: json['agentPaidAt'] != null
+          ? DateTime.parse(json['agentPaidAt'])
           : null,
     );
   }

@@ -75,17 +75,29 @@ class CustomTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppTheme.errorColor, width: 1),
+              borderSide: const BorderSide(
+                color: AppTheme.errorColor,
+                width: 1,
+              ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppTheme.errorColor, width: 2),
+              borderSide: const BorderSide(
+                color: AppTheme.errorColor,
+                width: 2,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
         ),
       ],
@@ -147,9 +159,15 @@ class CustomDropdown<T> extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
-              borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryColor,
+                width: 1,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
           icon: const Icon(Icons.keyboard_arrow_down, size: 24),
           dropdownColor: AppTheme.surfaceLift,
@@ -241,7 +259,11 @@ class CustomDatePicker extends StatelessWidget {
                         : AppTheme.onSurface,
                   ),
                 ),
-                const Icon(Icons.calendar_today, size: 18, color: AppTheme.onSurfaceVariant),
+                const Icon(
+                  Icons.calendar_today,
+                  size: 18,
+                  color: AppTheme.onSurfaceVariant,
+                ),
               ],
             ),
           ),

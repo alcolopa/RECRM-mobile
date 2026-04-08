@@ -15,6 +15,9 @@ class Contact {
   final DateTime updatedAt;
   final DateTime? lastContactedAt;
   final String organizationId;
+  final Map<String, dynamic>? buyerProfile;
+  final Map<String, dynamic>? sellerProfile;
+
 
   Contact({
     required this.id,
@@ -33,6 +36,8 @@ class Contact {
     required this.createdAt,
     required this.updatedAt,
     this.lastContactedAt,
+    this.buyerProfile,
+    this.sellerProfile,
   });
 
   factory Contact.fromJson(Map<String, dynamic> json) {
@@ -52,9 +57,11 @@ class Contact {
       tags: List<String>.from(json['tags'] ?? []),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      lastContactedAt: json['lastContactedAt'] != null 
-          ? DateTime.parse(json['lastContactedAt']) 
+      lastContactedAt: json['lastContactedAt'] != null
+          ? DateTime.parse(json['lastContactedAt'])
           : null,
+      buyerProfile: json['buyerProfile'],
+      sellerProfile: json['sellerProfile'],
     );
   }
 
@@ -72,6 +79,8 @@ class Contact {
       'status': status,
       'notes': notes,
       'tags': tags,
+      if (buyerProfile != null) 'buyerProfile': buyerProfile,
+      if (sellerProfile != null) 'sellerProfile': sellerProfile,
     };
   }
 

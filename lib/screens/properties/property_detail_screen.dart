@@ -15,7 +15,10 @@ class PropertyDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+    final currencyFormat = NumberFormat.currency(
+      symbol: '\$',
+      decimalDigits: 0,
+    );
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final canDelete = auth.hasPermission('PROPERTIES_DELETE');
 
@@ -42,7 +45,11 @@ class PropertyDetailScreen extends StatelessWidget {
                     )
                   : Container(
                       color: AppTheme.surfaceContainer,
-                      child: const Icon(LucideIcons.image, size: 60, color: AppTheme.onSurfaceVariant),
+                      child: const Icon(
+                        LucideIcons.image,
+                        size: 60,
+                        color: AppTheme.onSurfaceVariant,
+                      ),
                     ),
             ),
             leading: IconButton(
@@ -74,11 +81,13 @@ class PropertyDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Title & Price
                   Text(
                     property.title,
-                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   if (property.price != null)
@@ -89,17 +98,23 @@ class PropertyDetailScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  
+
                   const SizedBox(height: 16),
                   // Address
                   Row(
                     children: [
-                      const Icon(LucideIcons.mapPin, size: 16, color: AppTheme.onSurfaceVariant),
+                      const Icon(
+                        LucideIcons.mapPin,
+                        size: 16,
+                        color: AppTheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           property.address,
-                          style: theme.textTheme.bodyLarge?.copyWith(color: AppTheme.onSurfaceVariant),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: AppTheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ],
@@ -115,11 +130,14 @@ class PropertyDetailScreen extends StatelessWidget {
                   // Description
                   Text(
                     'About this property',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    property.description ?? 'No description available for this property.',
+                    property.description ??
+                        'No description available for this property.',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: AppTheme.onSurfaceVariant,
                       height: 1.6,
@@ -171,25 +189,49 @@ class PropertyDetailScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSpecItem(LucideIcons.bedDouble, '${property.bedrooms ?? 0}', 'Bedrooms', theme),
-        _buildSpecItem(LucideIcons.bath, '${property.bathrooms ?? 0}', 'Bathrooms', theme),
-        _buildSpecItem(LucideIcons.maximize, '${property.area ?? property.sizeSqm ?? 0}', 'SqM', theme),
+        _buildSpecItem(
+          LucideIcons.bedDouble,
+          '${property.bedrooms ?? 0}',
+          'Bedrooms',
+          theme,
+        ),
+        _buildSpecItem(
+          LucideIcons.bath,
+          '${property.bathrooms ?? 0}',
+          'Bathrooms',
+          theme,
+        ),
+        _buildSpecItem(
+          LucideIcons.maximize,
+          '${property.area ?? property.sizeSqm ?? 0}',
+          'SqM',
+          theme,
+        ),
       ],
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String value, String label, ThemeData theme) {
+  Widget _buildSpecItem(
+    IconData icon,
+    String value,
+    String label,
+    ThemeData theme,
+  ) {
     return Column(
       children: [
         Icon(icon, color: AppTheme.onSurfaceVariant, size: 24),
         const SizedBox(height: 8),
         Text(
           value,
-          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         Text(
           label,
-          style: theme.textTheme.labelSmall?.copyWith(color: AppTheme.onSurfaceVariant),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: AppTheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -200,7 +242,9 @@ class PropertyDetailScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Property'),
-        content: const Text('Are you sure you want to remove this listing? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to remove this listing? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -224,15 +268,15 @@ class PropertyDetailScreen extends StatelessWidget {
           await provider.deleteProperty(property.id, orgId);
           if (context.mounted) {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Property removed')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Property removed')));
           }
         } catch (e) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${e.toString()}')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
           }
         }
       }

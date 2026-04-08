@@ -79,7 +79,9 @@ class PayoutDeal {
       id: json['id'],
       title: json['title'],
       value: json['value'] != null ? (json['value']).toDouble() : null,
-      agentCommission: json['agentCommission'] != null ? (json['agentCommission']).toDouble() : null,
+      agentCommission: json['agentCommission'] != null
+          ? (json['agentCommission']).toDouble()
+          : null,
       isPaid: json['isPaid'] ?? false,
       paidAt: json['paidAt'] != null ? DateTime.parse(json['paidAt']) : null,
       createdAt: DateTime.parse(json['createdAt']),
@@ -91,10 +93,7 @@ class AdminPayoutStats {
   final PayoutSummary summary;
   final List<AgentPayoutStats> agents;
 
-  AdminPayoutStats({
-    required this.summary,
-    required this.agents,
-  });
+  AdminPayoutStats({required this.summary, required this.agents});
 
   factory AdminPayoutStats.fromJson(Map<String, dynamic> json) {
     return AdminPayoutStats(

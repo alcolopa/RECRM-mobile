@@ -17,7 +17,11 @@ class PlaceholderScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.construction, size: 64, color: AppTheme.onSurfaceVariant),
+            const Icon(
+              Icons.construction,
+              size: 64,
+              color: AppTheme.onSurfaceVariant,
+            ),
             const SizedBox(height: 16),
             Text(
               '$title Screen coming soon',

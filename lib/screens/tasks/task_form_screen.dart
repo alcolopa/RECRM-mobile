@@ -17,7 +17,7 @@ class TaskFormScreen extends StatefulWidget {
 
 class _TaskFormScreenState extends State<TaskFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
 
@@ -59,7 +59,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
       final data = {
         'title': _titleController.text.trim(),
-        'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+        'description': _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
         'status': _status,
         'priority': _priority,
         'dueDate': _dueDate?.toIso8601String(),
@@ -69,7 +71,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       if (widget.task == null) {
         await provider.createTask(data);
       } else {
-        await provider.updateTask(widget.task!.id, auth.currentOrganizationId!, data);
+        await provider.updateTask(
+          widget.task!.id,
+          auth.currentOrganizationId!,
+          data,
+        );
       }
 
       if (mounted) {
@@ -80,9 +86,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving task: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving task: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -101,13 +107,23 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             )
           else
             TextButton(
               onPressed: _save,
-              child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+              child: const Text(
+                'SAVE',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
             ),
         ],
       ),
@@ -121,7 +137,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               CustomTextField(
                 label: 'Task Title',
                 controller: _titleController,
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               CustomTextField(
@@ -138,7 +155,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       value: _status,
                       items: const [
                         DropdownMenuItem(value: 'TODO', child: Text('To Do')),
-                        DropdownMenuItem(value: 'IN_PROGRESS', child: Text('In Progress')),
+                        DropdownMenuItem(
+                          value: 'IN_PROGRESS',
+                          child: Text('In Progress'),
+                        ),
                         DropdownMenuItem(value: 'DONE', child: Text('Done')),
                       ],
                       onChanged: (value) {
@@ -153,7 +173,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       value: _priority,
                       items: const [
                         DropdownMenuItem(value: 'LOW', child: Text('Low')),
-                        DropdownMenuItem(value: 'MEDIUM', child: Text('Medium')),
+                        DropdownMenuItem(
+                          value: 'MEDIUM',
+                          child: Text('Medium'),
+                        ),
                         DropdownMenuItem(value: 'HIGH', child: Text('High')),
                       ],
                       onChanged: (value) {

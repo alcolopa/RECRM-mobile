@@ -60,10 +60,10 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
       body: provider.status == PayoutsStatus.loading
           ? const Center(child: CircularProgressIndicator())
           : provider.status == PayoutsStatus.error
-              ? Center(child: Text('Error: ${provider.errorMessage}'))
-              : isAdmin
-                  ? _buildAdminView(provider.adminStats!)
-                  : _buildAgentView(provider.personalStats!),
+          ? Center(child: Text('Error: ${provider.errorMessage}'))
+          : isAdmin
+          ? _buildAdminView(provider.adminStats!)
+          : _buildAgentView(provider.personalStats!),
     );
   }
 
@@ -81,10 +81,26 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
           crossAxisSpacing: 16,
           childAspectRatio: 1.5,
           children: [
-            _buildMetricCard('Total Sales', '\$${stats.summary.totalSales.toStringAsFixed(0)}', AppTheme.primaryColor),
-            _buildMetricCard('Commissions', '\$${stats.summary.totalCommissions.toStringAsFixed(0)}', Colors.orange),
-            _buildMetricCard('Agent Payouts', '\$${stats.summary.agentPayouts.toStringAsFixed(0)}', Colors.blue),
-            _buildMetricCard('Net Profit', '\$${stats.summary.totalProfit.toStringAsFixed(0)}', Colors.green),
+            _buildMetricCard(
+              'Total Sales',
+              '\$${stats.summary.totalSales.toStringAsFixed(0)}',
+              AppTheme.primaryColor,
+            ),
+            _buildMetricCard(
+              'Commissions',
+              '\$${stats.summary.totalCommissions.toStringAsFixed(0)}',
+              Colors.orange,
+            ),
+            _buildMetricCard(
+              'Agent Payouts',
+              '\$${stats.summary.agentPayouts.toStringAsFixed(0)}',
+              Colors.blue,
+            ),
+            _buildMetricCard(
+              'Net Profit',
+              '\$${stats.summary.totalProfit.toStringAsFixed(0)}',
+              Colors.green,
+            ),
           ],
         ),
         const SizedBox(height: 40),
@@ -101,13 +117,28 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
       children: [
         _buildEditorialHeader('Your Performance'),
         const SizedBox(height: 24),
-        _buildMainMetric('Total Sales', '\$${stats.totalSales.toStringAsFixed(0)}'),
+        _buildMainMetric(
+          'Total Sales',
+          '\$${stats.totalSales.toStringAsFixed(0)}',
+        ),
         const SizedBox(height: 32),
         Row(
           children: [
-            Expanded(child: _buildMetricCard('Total Earned', '\$${stats.totalEarned.toStringAsFixed(0)}', Colors.green)),
+            Expanded(
+              child: _buildMetricCard(
+                'Total Earned',
+                '\$${stats.totalEarned.toStringAsFixed(0)}',
+                Colors.green,
+              ),
+            ),
             const SizedBox(width: 16),
-            Expanded(child: _buildMetricCard('Pending', '\$${stats.pendingPayout.toStringAsFixed(0)}', Colors.orange)),
+            Expanded(
+              child: _buildMetricCard(
+                'Pending',
+                '\$${stats.pendingPayout.toStringAsFixed(0)}',
+                Colors.orange,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 40),
@@ -132,11 +163,7 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
           ),
         ),
         const SizedBox(height: 4),
-        Container(
-          width: 40,
-          height: 3,
-          color: AppTheme.primaryColor,
-        ),
+        Container(width: 40, height: 3, color: AppTheme.primaryColor),
       ],
     );
   }
@@ -215,16 +242,24 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
         side: BorderSide(color: AppTheme.surfaceContainer),
       ),
       child: ExpansionTile(
-        title: Text(agent.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          agent.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Text('Pending: \$${agent.pendingPayout.toStringAsFixed(0)}'),
-        children: agent.deals.map((deal) => _buildDealPayoutTile(deal, agentId: agent.id)).toList(),
+        children: agent.deals
+            .map((deal) => _buildDealPayoutTile(deal, agentId: agent.id))
+            .toList(),
       ),
     );
   }
 
   Widget _buildDealPayoutTile(PayoutDeal deal, {String? agentId}) {
     return ListTile(
-      title: Text(deal.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+      title: Text(
+        deal.title,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      ),
       subtitle: Text(deal.createdAt.toString().substring(0, 10)),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -256,15 +291,23 @@ class _PayoutsScreenState extends State<PayoutsScreen> {
   Future<void> _markAsPaid(String dealId) async {
     final auth = context.read<AuthProvider>();
     final provider = context.read<PayoutsProvider>();
-    
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Mark as Paid?'),
-        content: const Text('Are you sure you want to mark this payout as completed?'),
+        content: const Text(
+          'Are you sure you want to mark this payout as completed?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('MARK PAID')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('MARK PAID'),
+          ),
         ],
       ),
     );

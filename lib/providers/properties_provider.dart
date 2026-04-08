@@ -6,7 +6,7 @@ enum PropertiesStatus { initial, loading, loaded, error }
 
 class PropertiesProvider with ChangeNotifier {
   final PropertiesService _service = PropertiesService();
-  
+
   List<Property> _properties = [];
   PropertiesStatus _status = PropertiesStatus.initial;
   String? _errorMessage;
@@ -56,7 +56,11 @@ class PropertiesProvider with ChangeNotifier {
     }
   }
 
-  Future<void> uploadPropertyImage(String propertyId, String filePath, String organizationId) async {
+  Future<void> uploadPropertyImage(
+    String propertyId,
+    String filePath,
+    String organizationId,
+  ) async {
     try {
       await _service.uploadPropertyImage(propertyId, filePath, organizationId);
       // Wait for a second and then re-fetch properties to get the new images?

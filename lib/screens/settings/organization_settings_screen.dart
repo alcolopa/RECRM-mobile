@@ -14,10 +14,12 @@ class OrganizationSettingsScreen extends StatefulWidget {
   const OrganizationSettingsScreen({super.key});
 
   @override
-  State<OrganizationSettingsScreen> createState() => _OrganizationSettingsScreenState();
+  State<OrganizationSettingsScreen> createState() =>
+      _OrganizationSettingsScreenState();
 }
 
-class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen> with SingleTickerProviderStateMixin {
+class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _organizationService = OrganizationService();
   final _commissionService = CommissionService();
@@ -100,7 +102,7 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
         _addressController.text = _org?.address ?? '';
         _selectedAccentColor = _org?.accentColor ?? 'EMERALD';
         _selectedTheme = _org?.defaultTheme ?? 'LIGHT';
-        
+
         _initCommControllers();
         _isLoading = false;
       });
@@ -127,19 +129,26 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
 
   void _updateCommCtrl(String key, double? val) {
     if (!_commControllers.containsKey(key)) {
-      _commControllers[key] = TextEditingController(text: val?.toString() ?? '');
+      _commControllers[key] = TextEditingController(
+        text: val?.toString() ?? '',
+      );
     } else if (_commControllers[key]!.text != (val?.toString() ?? '')) {
       _commControllers[key]!.text = val?.toString() ?? '';
     }
   }
 
   Future<void> _pickAndUploadLogo() async {
-    final XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (image == null) return;
 
     setState(() => _isUploadingLogo = true);
     try {
-      final logoUrl = await _organizationService.uploadLogo(_org!.id, image.path);
+      final logoUrl = await _organizationService.uploadLogo(
+        _org!.id,
+        image.path,
+      );
       if (!mounted) return;
       context.read<AuthProvider>().updateOrganizationLogo(logoUrl);
       setState(() {
@@ -164,9 +173,9 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to upload logo')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Failed to upload logo')));
       }
     } finally {
       if (mounted) setState(() => _isUploadingLogo = false);
@@ -196,7 +205,9 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(auth.errors?['message'] ?? 'Failed to save settings')),
+        SnackBar(
+          content: Text(auth.errors?['message'] ?? 'Failed to save settings'),
+        ),
       );
     }
   }
@@ -204,9 +215,7 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final auth = context.watch<AuthProvider>();
@@ -215,8 +224,9 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: Text('Organization Settings', 
-          style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 18)
+        title: Text(
+          'Organization Settings',
+          style: GoogleFonts.manrope(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: AppTheme.backgroundColor,
         elevation: 0,
@@ -276,11 +286,18 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppTheme.surfaceContainer),
               image: _org?.logo != null
-                  ? DecorationImage(image: NetworkImage(_org!.logo!), fit: BoxFit.contain)
+                  ? DecorationImage(
+                      image: NetworkImage(_org!.logo!),
+                      fit: BoxFit.contain,
+                    )
                   : null,
             ),
             child: _org?.logo == null
-                ? const Icon(LucideIcons.building2, size: 48, color: AppTheme.onSurfaceVariant)
+                ? const Icon(
+                    LucideIcons.building2,
+                    size: 48,
+                    color: AppTheme.onSurfaceVariant,
+                  )
                 : null,
           ),
           if (_isUploadingLogo)
@@ -290,7 +307,9 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
                   color: Colors.black26,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
               ),
             ),
           if (isOwner)
@@ -304,9 +323,19 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
                   decoration: const BoxDecoration(
                     color: AppTheme.primaryColor,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: const Icon(LucideIcons.camera, size: 18, color: Colors.white),
+                  child: const Icon(
+                    LucideIcons.camera,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -316,7 +345,14 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
   }
 
   Widget _buildThemeSection(bool isOwner) {
-    final colors = ['EMERALD', 'SAPPHIRE', 'AMETHYST', 'CITRINE', 'ROSE', 'SLATE'];
+    final colors = [
+      'EMERALD',
+      'SAPPHIRE',
+      'AMETHYST',
+      'CITRINE',
+      'ROSE',
+      'SLATE',
+    ];
     final colorMap = {
       'EMERALD': const Color(0xFF059669),
       'SAPPHIRE': const Color(0xFF2563EB),
@@ -331,7 +367,10 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       children: [
         _buildSectionTitle('Theme & Appearance'),
         const SizedBox(height: 16),
-        Text('Accent Color', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(
+          'Accent Color',
+          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 12,
@@ -339,23 +378,38 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
           children: colors.map((c) {
             final isSelected = _selectedAccentColor == c;
             return GestureDetector(
-              onTap: isOwner ? () => setState(() => _selectedAccentColor = c) : null,
+              onTap: isOwner
+                  ? () => setState(() => _selectedAccentColor = c)
+                  : null,
               child: Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
                   color: colorMap[c],
                   shape: BoxShape.circle,
-                  border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
-                  boxShadow: isSelected ? [const BoxShadow(color: Colors.black26, blurRadius: 4)] : null,
+                  border: isSelected
+                      ? Border.all(color: Colors.white, width: 3)
+                      : null,
+                  boxShadow: isSelected
+                      ? [const BoxShadow(color: Colors.black26, blurRadius: 4)]
+                      : null,
                 ),
-                child: isSelected ? const Icon(LucideIcons.check, size: 20, color: Colors.white) : null,
+                child: isSelected
+                    ? const Icon(
+                        LucideIcons.check,
+                        size: 20,
+                        color: Colors.white,
+                      )
+                    : null,
               ),
             );
           }).toList(),
         ),
         const SizedBox(height: 24),
-        Text('Default Public Theme', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(
+          'Default Public Theme',
+          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -378,18 +432,27 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
           decoration: BoxDecoration(
             color: isSelected ? AppTheme.primaryColor : AppTheme.surfaceLift,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: isSelected ? AppTheme.primaryColor : AppTheme.surfaceContainer),
+            border: Border.all(
+              color: isSelected
+                  ? AppTheme.primaryColor
+                  : AppTheme.surfaceContainer,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 18, color: isSelected ? Colors.white : AppTheme.onSurfaceVariant),
+              Icon(
+                icon,
+                size: 18,
+                color: isSelected ? Colors.white : AppTheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 8),
-              Text(mode == 'LIGHT' ? 'Light' : 'Dark', 
+              Text(
+                mode == 'LIGHT' ? 'Light' : 'Dark',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: isSelected ? Colors.white : AppTheme.onSurfaceVariant
-                )
+                  color: isSelected ? Colors.white : AppTheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -445,8 +508,15 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isSavingGeneral ? null : () => _saveGeneral(auth),
-                child: _isSavingGeneral 
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                child: _isSavingGeneral
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('Save Changes'),
               ),
             ),
@@ -509,9 +579,16 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Seat Usage', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-              Text('${sub.usedSeats} / ${sub.seats}', 
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: isFull ? Colors.red : AppTheme.primaryColor)
+              Text(
+                'Seat Usage',
+                style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${sub.usedSeats} / ${sub.seats}',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  color: isFull ? Colors.red : AppTheme.primaryColor,
+                ),
               ),
             ],
           ),
@@ -521,14 +598,17 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: AppTheme.surfaceContainer,
-              valueColor: AlwaysStoppedAnimation<Color>(isFull ? Colors.red : AppTheme.primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isFull ? Colors.red : AppTheme.primaryColor,
+              ),
               minHeight: 8,
             ),
           ),
           if (isFull) ...[
             const SizedBox(height: 8),
-            const Text('You have reached your seat limit. Increase seats to invite more members.', 
-              style: TextStyle(fontSize: 12, color: Colors.grey)
+            const Text(
+              'You have reached your seat limit. Increase seats to invite more members.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ],
@@ -554,8 +634,18 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
         children: [
           CircleAvatar(
             backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
-            backgroundImage: (user?.avatar != null && user!.avatar!.isNotEmpty) ? NetworkImage(user.avatar!) : null,
-            child: (user?.avatar == null || user!.avatar!.isEmpty) ? Text(name.isNotEmpty ? name[0] : '?', style: const TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)) : null,
+            backgroundImage: (user?.avatar != null && user!.avatar!.isNotEmpty)
+                ? NetworkImage(user.avatar!)
+                : null,
+            child: (user?.avatar == null || user!.avatar!.isEmpty)
+                ? Text(
+                    name.isNotEmpty ? name[0] : '?',
+                    style: const TextStyle(
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -563,7 +653,13 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(customRole ?? role, style: TextStyle(fontSize: 12, color: AppTheme.onSurfaceVariant)),
+                Text(
+                  customRole ?? role,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
           ),
@@ -572,11 +668,21 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               icon: const Icon(LucideIcons.moreVertical),
               itemBuilder: (ctx) => [
                 const PopupMenuItem(value: 'role', child: Text('Change Role')),
-                const PopupMenuItem(value: 'remove', child: Text('Remove Member', style: TextStyle(color: Colors.red))),
+                const PopupMenuItem(
+                  value: 'remove',
+                  child: Text(
+                    'Remove Member',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
               ],
               onSelected: (val) {
-                if (val == 'role') _showChangeRoleDialog(m);
-                if (val == 'remove') _confirmRemoveMember(m);
+                if (val == 'role') {
+                  _showChangeRoleDialog(m);
+                }
+                if (val == 'remove') {
+                  _confirmRemoveMember(m);
+                }
               },
             ),
         ],
@@ -591,7 +697,10 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       decoration: BoxDecoration(
         color: AppTheme.surfaceLift,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.surfaceContainer, style: BorderStyle.solid),
+        border: Border.all(
+          color: AppTheme.surfaceContainer,
+          style: BorderStyle.solid,
+        ),
       ),
       child: Row(
         children: [
@@ -601,9 +710,16 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(i.email, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text('Pending • ${i.customRole?.name ?? i.role}', 
-                  style: TextStyle(fontSize: 12, color: AppTheme.onSurfaceVariant)
+                Text(
+                  i.email,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Pending • ${i.customRole?.name ?? i.role}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -612,12 +728,25 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
             PopupMenuButton(
               icon: const Icon(LucideIcons.moreVertical),
               itemBuilder: (ctx) => [
-                const PopupMenuItem(value: 'resend', child: Text('Resend Invite')),
-                const PopupMenuItem(value: 'cancel', child: Text('Cancel Invite', style: TextStyle(color: Colors.red))),
+                const PopupMenuItem(
+                  value: 'resend',
+                  child: Text('Resend Invite'),
+                ),
+                const PopupMenuItem(
+                  value: 'cancel',
+                  child: Text(
+                    'Cancel Invite',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
               ],
               onSelected: (val) {
-                if (val == 'resend') _resendInvitation(i);
-                if (val == 'cancel') _cancelInvitation(i);
+                if (val == 'resend') {
+                  _resendInvitation(i);
+                }
+                if (val == 'cancel') {
+                  _cancelInvitation(i);
+                }
               },
             ),
         ],
@@ -668,8 +797,17 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(r.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text('${r.permissions.length} Permissions', style: TextStyle(fontSize: 12, color: AppTheme.onSurfaceVariant)),
+                Text(
+                  r.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${r.permissions.length} Permissions',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
           ),
@@ -686,7 +824,9 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
   // --- TAB: Commission ---
 
   Widget _buildCommissionTab() {
-    if (_commissionConfig == null) return const Center(child: CircularProgressIndicator());
+    if (_commissionConfig == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -723,25 +863,43 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(
+            title,
+            style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
           const SizedBox(height: 16),
-          _buildCommissionInputRow('Buyer Side', 
-            val: isRent ? _commissionConfig!.rentBuyerValue : _commissionConfig!.saleBuyerValue,
-            type: isRent ? _commissionConfig!.rentBuyerType : _commissionConfig!.saleBuyerType,
+          _buildCommissionInputRow(
+            'Buyer Side',
+            val: isRent
+                ? _commissionConfig!.rentBuyerValue
+                : _commissionConfig!.saleBuyerValue,
+            type: isRent
+                ? _commissionConfig!.rentBuyerType
+                : _commissionConfig!.saleBuyerType,
             key: isRent ? 'rentBuyer' : 'saleBuyer',
             onChanged: (v, t) => _updateCommission(isRent, 'buyer', v, t),
           ),
           const SizedBox(height: 12),
-          _buildCommissionInputRow('Seller Side', 
-            val: isRent ? _commissionConfig!.rentSellerValue : _commissionConfig!.saleSellerValue,
-            type: isRent ? _commissionConfig!.rentSellerType : _commissionConfig!.saleSellerType,
+          _buildCommissionInputRow(
+            'Seller Side',
+            val: isRent
+                ? _commissionConfig!.rentSellerValue
+                : _commissionConfig!.saleSellerValue,
+            type: isRent
+                ? _commissionConfig!.rentSellerType
+                : _commissionConfig!.saleSellerType,
             key: isRent ? 'rentSeller' : 'saleSeller',
             onChanged: (v, t) => _updateCommission(isRent, 'seller', v, t),
           ),
           const SizedBox(height: 12),
-          _buildCommissionInputRow('Agent Share', 
-            val: isRent ? _commissionConfig!.rentAgentValue : _commissionConfig!.saleAgentValue,
-            type: isRent ? _commissionConfig!.rentAgentType : _commissionConfig!.saleAgentType,
+          _buildCommissionInputRow(
+            'Agent Share',
+            val: isRent
+                ? _commissionConfig!.rentAgentValue
+                : _commissionConfig!.saleAgentValue,
+            type: isRent
+                ? _commissionConfig!.rentAgentType
+                : _commissionConfig!.saleAgentType,
             key: isRent ? 'rentAgent' : 'saleAgent',
             onChanged: (v, t) => _updateCommission(isRent, 'agent', v, t),
           ),
@@ -750,24 +908,42 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
     );
   }
 
-  Widget _buildCommissionInputRow(String label, {required double? val, required String type, required String key, required Function(double?, String) onChanged}) {
-    final ctrl = _commControllers[key] ?? TextEditingController(text: val?.toString() ?? '');
+  Widget _buildCommissionInputRow(
+    String label, {
+    required double? val,
+    required String type,
+    required String key,
+    required Function(double?, String) onChanged,
+  }) {
+    final ctrl =
+        _commControllers[key] ??
+        TextEditingController(text: val?.toString() ?? '');
     _commControllers[key] = ctrl;
 
     return Row(
       children: [
-        Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 14))),
+        Expanded(
+          flex: 3,
+          child: Text(label, style: const TextStyle(fontSize: 14)),
+        ),
         Expanded(
           flex: 4,
           child: SizedBox(
             height: 40,
             child: TextField(
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               controller: ctrl,
               decoration: InputDecoration(
                 hintText: '0.00',
-                suffixText: type == 'PERCENTAGE' ? '%' : (type == 'MULTIPLIER' ? 'x' : '\$'),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                suffixText: type == 'PERCENTAGE'
+                    ? '%'
+                    : (type == 'MULTIPLIER' ? 'x' : '\$'),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
               onChanged: (s) => onChanged(double.tryParse(s), type),
             ),
@@ -832,13 +1008,20 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
 
   Future<void> _saveCommission() async {
     try {
-      await _commissionService.updateOrgCommission(_org!.id, _commissionConfig!.toJson());
+      await _commissionService.updateOrgCommission(
+        _org!.id,
+        _commissionConfig!.toJson(),
+      );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Commission configuration saved')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Commission configuration saved')),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to save commission settings')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save commission settings')),
+        );
       }
     }
   }
@@ -846,7 +1029,14 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
   // --- Dialogs & Helpers ---
 
   Widget _buildSectionTitle(String title) {
-    return Text(title, style: GoogleFonts.manrope(fontWeight: FontWeight.w800, fontSize: 18, color: AppTheme.onSurface));
+    return Text(
+      title,
+      style: GoogleFonts.manrope(
+        fontWeight: FontWeight.w800,
+        fontSize: 18,
+        color: AppTheme.onSurface,
+      ),
+    );
   }
 
   void _showInviteDialog() {
@@ -866,22 +1056,43 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               DropdownButtonFormField<String>(
                 initialValue: selectedCustomRoleId,
                 decoration: const InputDecoration(labelText: 'Role'),
-                items: _roles.map((r) => DropdownMenuItem(value: r.id, child: Text(r.name))).toList(),
-                onChanged: (v) => setDialogState(() => selectedCustomRoleId = v),
+                items: _roles
+                    .map(
+                      (r) => DropdownMenuItem(value: r.id, child: Text(r.name)),
+                    )
+                    .toList(),
+                onChanged: (v) =>
+                    setDialogState(() => selectedCustomRoleId = v),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('CANCEL'),
+            ),
             ElevatedButton(
               onPressed: () async {
-                if (emailCtrl.text.isEmpty || selectedCustomRoleId == null) return;
+                if (emailCtrl.text.isEmpty || selectedCustomRoleId == null) {
+                  return;
+                }
                 try {
-                  await _organizationService.inviteMember(_org!.id, emailCtrl.text.trim(), 'AGENT', selectedCustomRoleId!);
+                  await _organizationService.inviteMember(
+                    _org!.id,
+                    emailCtrl.text.trim(),
+                    'AGENT',
+                    selectedCustomRoleId!,
+                  );
                   _loadData();
-                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (ctx.mounted) {
+                    Navigator.pop(ctx);
+                  }
                 } catch (e) {
-                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Failed to send invite')));
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Failed to send invite')),
+                    );
+                  }
                 }
               },
               child: const Text('SEND INVITE'),
@@ -902,20 +1113,37 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
           content: DropdownButtonFormField<String>(
             initialValue: selectedCustomRoleId,
             decoration: const InputDecoration(labelText: 'New Role'),
-            items: _roles.map((r) => DropdownMenuItem(value: r.id, child: Text(r.name))).toList(),
+            items: _roles
+                .map((r) => DropdownMenuItem(value: r.id, child: Text(r.name)))
+                .toList(),
             onChanged: (v) => setDialogState(() => selectedCustomRoleId = v),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('CANCEL'),
+            ),
             ElevatedButton(
               onPressed: () async {
-                if (selectedCustomRoleId == null) return;
+                if (selectedCustomRoleId == null) {
+                  return;
+                }
                 try {
-                  await _organizationService.updateMemberRole(_org!.id, m.id, selectedCustomRoleId!);
+                  await _organizationService.updateMemberRole(
+                    _org!.id,
+                    m.id,
+                    selectedCustomRoleId!,
+                  );
                   _loadData();
-                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (ctx.mounted) {
+                    Navigator.pop(ctx);
+                  }
                 } catch (e) {
-                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Failed to update role')));
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Failed to update role')),
+                    );
+                  }
                 }
               },
               child: const Text('UPDATE'),
@@ -931,17 +1159,28 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Remove Member?'),
-        content: Text('Are you sure you want to remove ${m.user?.fullName} from the organization?'),
+        content: Text(
+          'Are you sure you want to remove ${m.user?.fullName} from the organization?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () async {
               try {
                 await _organizationService.removeMember(_org!.id, m.id);
                 _loadData();
-                if (ctx.mounted) Navigator.pop(ctx);
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                }
               } catch (e) {
-                if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Failed to remove member')));
+                if (ctx.mounted) {
+                  ScaffoldMessenger.of(ctx).showSnackBar(
+                    const SnackBar(content: Text('Failed to remove member')),
+                  );
+                }
               }
             },
             child: const Text('REMOVE', style: TextStyle(color: Colors.red)),
@@ -954,9 +1193,17 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
   void _resendInvitation(Invitation i) async {
     try {
       await _organizationService.resendInvitation(_org!.id, i.id);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invitation resent')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invitation resent')),
+        );
+      }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to resend invitation')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to resend invitation')),
+        );
+      }
     }
   }
 
@@ -965,7 +1212,11 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
       await _organizationService.cancelInvitation(_org!.id, i.id);
       _loadData();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to cancel invitation')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to cancel invitation')),
+        );
+      }
     }
   }
 
@@ -974,12 +1225,30 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
     List<String> selectedPerms = List.from(role?.permissions ?? []);
 
     final allPermissions = [
-      'LEADS_VIEW', 'LEADS_CREATE', 'LEADS_EDIT', 'LEADS_DELETE',
-      'CONTACTS_VIEW', 'CONTACTS_CREATE', 'CONTACTS_EDIT', 'CONTACTS_DELETE',
-      'PROPERTIES_VIEW', 'PROPERTIES_CREATE', 'PROPERTIES_EDIT', 'PROPERTIES_DELETE',
-      'DEALS_VIEW', 'DEALS_CREATE', 'DEALS_EDIT', 'DEALS_DELETE',
-      'TEAM_VIEW', 'TEAM_INVITE', 'TEAM_EDIT_ROLES', 'TEAM_REMOVE_MEMBER',
-      'ORG_SETTINGS_EDIT', 'DASHBOARD_VIEW', 'PAYOUTS_VIEW', 'TASKS_VIEW',
+      'LEADS_VIEW',
+      'LEADS_CREATE',
+      'LEADS_EDIT',
+      'LEADS_DELETE',
+      'CONTACTS_VIEW',
+      'CONTACTS_CREATE',
+      'CONTACTS_EDIT',
+      'CONTACTS_DELETE',
+      'PROPERTIES_VIEW',
+      'PROPERTIES_CREATE',
+      'PROPERTIES_EDIT',
+      'PROPERTIES_DELETE',
+      'DEALS_VIEW',
+      'DEALS_CREATE',
+      'DEALS_EDIT',
+      'DEALS_DELETE',
+      'TEAM_VIEW',
+      'TEAM_INVITE',
+      'TEAM_EDIT_ROLES',
+      'TEAM_REMOVE_MEMBER',
+      'ORG_SETTINGS_EDIT',
+      'DASHBOARD_VIEW',
+      'PAYOUTS_VIEW',
+      'TASKS_VIEW',
     ];
 
     showDialog(
@@ -994,24 +1263,34 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
               children: [
                 CustomTextField(label: 'Role Name', controller: nameCtrl),
                 const SizedBox(height: 16),
-                const Text('Permissions', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Permissions',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Expanded(
                   child: ListView(
-                    children: allPermissions.map((p) => CheckboxListTile(
-                      title: Text(p.replaceAll('_', ' '), style: const TextStyle(fontSize: 12)),
-                      value: selectedPerms.contains(p),
-                      onChanged: (v) {
-                        setDialogState(() {
-                          if (v!) {
-                            selectedPerms.add(p);
-                          } else {
-                            selectedPerms.remove(p);
-                          }
-                        });
-                      },
-                      dense: true,
-                    )).toList(),
+                    children: allPermissions
+                        .map(
+                          (p) => CheckboxListTile(
+                            title: Text(
+                              p.replaceAll('_', ' '),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            value: selectedPerms.contains(p),
+                            onChanged: (v) {
+                              setDialogState(() {
+                                if (v!) {
+                                  selectedPerms.add(p);
+                                } else {
+                                  selectedPerms.remove(p);
+                                }
+                              });
+                            },
+                            dense: true,
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ],
@@ -1024,27 +1303,56 @@ class _OrganizationSettingsScreenState extends State<OrganizationSettingsScreen>
                   try {
                     await _organizationService.deleteRole(_org!.id, role.id);
                     _loadData();
-                    if (ctx.mounted) Navigator.pop(ctx);
+                    if (ctx.mounted) {
+                      Navigator.pop(ctx);
+                    }
                   } catch (e) {
-                    if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Failed to delete role')));
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(content: Text('Failed to delete role')),
+                      );
+                    }
                   }
                 },
-                child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+                child: const Text(
+                  'DELETE',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('CANCEL'),
+            ),
             ElevatedButton(
               onPressed: () async {
-                if (nameCtrl.text.isEmpty) return;
+                if (nameCtrl.text.isEmpty) {
+                  return;
+                }
                 try {
                   if (role == null) {
-                    await _organizationService.createRole(_org!.id, nameCtrl.text.trim(), selectedPerms);
+                    await _organizationService.createRole(
+                      _org!.id,
+                      nameCtrl.text.trim(),
+                      selectedPerms,
+                    );
                   } else {
-                    await _organizationService.updateRole(_org!.id, role.id, nameCtrl.text.trim(), selectedPerms);
+                    await _organizationService.updateRole(
+                      _org!.id,
+                      role.id,
+                      nameCtrl.text.trim(),
+                      selectedPerms,
+                    );
                   }
                   _loadData();
-                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (ctx.mounted) {
+                    Navigator.pop(ctx);
+                  }
                 } catch (e) {
-                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Failed to save role')));
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Failed to save role')),
+                    );
+                  }
                 }
               },
               child: const Text('SAVE'),

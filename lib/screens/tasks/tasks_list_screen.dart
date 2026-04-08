@@ -44,7 +44,10 @@ class _TasksListScreenState extends State<TasksListScreen> {
         backgroundColor: AppTheme.backgroundColor,
         actions: [
           IconButton(
-            icon: Icon(LucideIcons.filter, color: _selectedStatus != null ? AppTheme.primaryColor : null),
+            icon: Icon(
+              LucideIcons.filter,
+              color: _selectedStatus != null ? AppTheme.primaryColor : null,
+            ),
             onPressed: _showFilterMenu,
           ),
         ],
@@ -67,14 +70,19 @@ class _TasksListScreenState extends State<TasksListScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.backgroundColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Filter by Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Filter by Status',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             _filterOption(null, 'All Tasks'),
             _filterOption('TODO', 'To Do'),
@@ -90,7 +98,9 @@ class _TasksListScreenState extends State<TasksListScreen> {
   Widget _filterOption(String? value, String label) {
     return ListTile(
       title: Text(label),
-      trailing: _selectedStatus == value ? const Icon(LucideIcons.check, color: AppTheme.primaryColor) : null,
+      trailing: _selectedStatus == value
+          ? const Icon(LucideIcons.check, color: AppTheme.primaryColor)
+          : null,
       onTap: () {
         setState(() => _selectedStatus = value);
         Navigator.pop(context);
@@ -98,7 +108,11 @@ class _TasksListScreenState extends State<TasksListScreen> {
     );
   }
 
-  Widget _buildTasksList(TasksProvider provider, List tasks, AuthProvider auth) {
+  Widget _buildTasksList(
+    TasksProvider provider,
+    List tasks,
+    AuthProvider auth,
+  ) {
     if (provider.status == TasksStatus.loading && provider.tasks.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -119,7 +133,9 @@ class _TasksListScreenState extends State<TasksListScreen> {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1)),
+            side: BorderSide(
+              color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1),
+            ),
           ),
           color: AppTheme.surfaceLift,
           child: ListTile(
@@ -142,20 +158,38 @@ class _TasksListScreenState extends State<TasksListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (task.description != null && task.description!.isNotEmpty)
-                  Text(task.description!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+                  Text(
+                    task.description!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(LucideIcons.calendar, size: 12, color: _getPriorityColor(task.priority)),
+                    Icon(
+                      LucideIcons.calendar,
+                      size: 12,
+                      color: _getPriorityColor(task.priority),
+                    ),
                     const SizedBox(width: 4),
                     Text(
-                      task.dueDate != null ? '${task.dueDate!.day}/${task.dueDate!.month}' : 'No date',
-                      style: TextStyle(fontSize: 11, color: _getPriorityColor(task.priority)),
+                      task.dueDate != null
+                          ? '${task.dueDate!.day}/${task.dueDate!.month}'
+                          : 'No date',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: _getPriorityColor(task.priority),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       task.priority,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _getPriorityColor(task.priority)),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: _getPriorityColor(task.priority),
+                      ),
                     ),
                   ],
                 ),
@@ -165,7 +199,9 @@ class _TasksListScreenState extends State<TasksListScreen> {
               icon: const Icon(LucideIcons.edit2, size: 18),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TaskFormScreen(task: task)),
+                MaterialPageRoute(
+                  builder: (context) => TaskFormScreen(task: task),
+                ),
               ),
             ),
             onLongPress: () => _confirmDelete(context, auth, provider, task.id),
@@ -177,34 +213,58 @@ class _TasksListScreenState extends State<TasksListScreen> {
 
   Color _getPriorityColor(String priority) {
     switch (priority) {
-      case 'HIGH': return AppTheme.errorColor;
-      case 'MEDIUM': return Colors.orange;
-      case 'LOW': return Colors.green;
-      default: return AppTheme.onSurfaceVariant;
+      case 'HIGH':
+        return AppTheme.errorColor;
+      case 'MEDIUM':
+        return Colors.orange;
+      case 'LOW':
+        return Colors.green;
+      default:
+        return AppTheme.onSurfaceVariant;
     }
   }
 
-  Future<void> _toggleTask(BuildContext context, AuthProvider auth, TasksProvider provider, dynamic task) async {
+  Future<void> _toggleTask(
+    BuildContext context,
+    AuthProvider auth,
+    TasksProvider provider,
+    dynamic task,
+  ) async {
     try {
       final newStatus = task.status == 'DONE' ? 'TODO' : 'DONE';
-      await provider.updateTask(task.id, auth.currentOrganizationId!, {'status': newStatus});
+      await provider.updateTask(task.id, auth.currentOrganizationId!, {
+        'status': newStatus,
+      });
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating task: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating task: $e')));
       }
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, AuthProvider auth, TasksProvider provider, String taskId) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    AuthProvider auth,
+    TasksProvider provider,
+    String taskId,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Task?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true), 
-            child: const Text('DELETE', style: TextStyle(color: AppTheme.errorColor)),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'DELETE',
+              style: TextStyle(color: AppTheme.errorColor),
+            ),
           ),
         ],
       ),

@@ -25,7 +25,7 @@ class DealFormScreen extends StatefulWidget {
 
 class _DealFormScreenState extends State<DealFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _titleController;
   late TextEditingController _valueController;
   late TextEditingController _propertyPriceController;
@@ -35,7 +35,7 @@ class _DealFormScreenState extends State<DealFormScreen> {
 
   String _stage = 'DISCOVERY';
   String _type = 'SALE';
-  
+
   String? _selectedPropertyId;
   String? _selectedContactId;
   String? _selectedLeadId;
@@ -48,10 +48,18 @@ class _DealFormScreenState extends State<DealFormScreen> {
     final deal = widget.deal;
     _titleController = TextEditingController(text: deal?.title);
     _valueController = TextEditingController(text: deal?.value?.toString());
-    _propertyPriceController = TextEditingController(text: deal?.propertyPrice?.toString());
-    _rentPriceController = TextEditingController(text: deal?.rentPrice?.toString());
-    _buyerCommissionController = TextEditingController(text: deal?.buyerCommission?.toString());
-    _sellerCommissionController = TextEditingController(text: deal?.sellerCommission?.toString());
+    _propertyPriceController = TextEditingController(
+      text: deal?.propertyPrice?.toString(),
+    );
+    _rentPriceController = TextEditingController(
+      text: deal?.rentPrice?.toString(),
+    );
+    _buyerCommissionController = TextEditingController(
+      text: deal?.buyerCommission?.toString(),
+    );
+    _sellerCommissionController = TextEditingController(
+      text: deal?.sellerCommission?.toString(),
+    );
 
     if (deal != null) {
       _stage = deal.stage;
@@ -65,8 +73,12 @@ class _DealFormScreenState extends State<DealFormScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       if (auth.currentOrganizationId != null) {
-        context.read<PropertiesProvider>().fetchProperties(auth.currentOrganizationId!);
-        context.read<ContactsProvider>().fetchContacts(auth.currentOrganizationId!);
+        context.read<PropertiesProvider>().fetchProperties(
+          auth.currentOrganizationId!,
+        );
+        context.read<ContactsProvider>().fetchContacts(
+          auth.currentOrganizationId!,
+        );
         context.read<LeadsProvider>().fetchLeads(auth.currentOrganizationId!);
       }
     });
@@ -94,23 +106,37 @@ class _DealFormScreenState extends State<DealFormScreen> {
 
       final data = {
         'title': _titleController.text.trim(),
-        'value': _valueController.text.trim().isEmpty ? null : double.tryParse(_valueController.text.trim()),
+        'value': _valueController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_valueController.text.trim()),
         'stage': _stage,
         'type': _type,
         'propertyId': _selectedPropertyId,
         'contactId': _selectedContactId,
         'leadId': _selectedLeadId,
-        'propertyPrice': _propertyPriceController.text.trim().isEmpty ? null : double.tryParse(_propertyPriceController.text.trim()),
-        'rentPrice': _rentPriceController.text.trim().isEmpty ? null : double.tryParse(_rentPriceController.text.trim()),
-        'buyerCommission': _buyerCommissionController.text.trim().isEmpty ? null : double.tryParse(_buyerCommissionController.text.trim()),
-        'sellerCommission': _sellerCommissionController.text.trim().isEmpty ? null : double.tryParse(_sellerCommissionController.text.trim()),
+        'propertyPrice': _propertyPriceController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_propertyPriceController.text.trim()),
+        'rentPrice': _rentPriceController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_rentPriceController.text.trim()),
+        'buyerCommission': _buyerCommissionController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_buyerCommissionController.text.trim()),
+        'sellerCommission': _sellerCommissionController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_sellerCommissionController.text.trim()),
         'organizationId': auth.currentOrganizationId,
       };
 
       if (widget.deal == null) {
         await provider.createDeal(data);
       } else {
-        await provider.updateDeal(widget.deal!.id, auth.currentOrganizationId!, data);
+        await provider.updateDeal(
+          widget.deal!.id,
+          auth.currentOrganizationId!,
+          data,
+        );
       }
 
       if (mounted) {
@@ -121,9 +147,9 @@ class _DealFormScreenState extends State<DealFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving deal: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving deal: $e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -142,13 +168,23 @@ class _DealFormScreenState extends State<DealFormScreen> {
             const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             )
           else
             TextButton(
               onPressed: _save,
-              child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+              child: const Text(
+                'SAVE',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
             ),
         ],
       ),
@@ -162,7 +198,8 @@ class _DealFormScreenState extends State<DealFormScreen> {
               CustomTextField(
                 label: 'Deal Title',
                 controller: _titleController,
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
               Row(
@@ -186,11 +223,26 @@ class _DealFormScreenState extends State<DealFormScreen> {
                       label: 'Stage',
                       value: _stage,
                       items: const [
-                        DropdownMenuItem(value: 'DISCOVERY', child: Text('Discovery')),
-                        DropdownMenuItem(value: 'PROPOSAL', child: Text('Proposal')),
-                        DropdownMenuItem(value: 'NEGOTIATION', child: Text('Negotiation')),
-                        DropdownMenuItem(value: 'CLOSED_WON', child: Text('Closed Won')),
-                        DropdownMenuItem(value: 'CLOSED_LOST', child: Text('Closed Lost')),
+                        DropdownMenuItem(
+                          value: 'DISCOVERY',
+                          child: Text('Discovery'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'PROPOSAL',
+                          child: Text('Proposal'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'NEGOTIATION',
+                          child: Text('Negotiation'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'CLOSED_WON',
+                          child: Text('Closed Won'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'CLOSED_LOST',
+                          child: Text('Closed Lost'),
+                        ),
                       ],
                       onChanged: (value) {
                         if (value != null) setState(() => _stage = value);
@@ -200,14 +252,23 @@ class _DealFormScreenState extends State<DealFormScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              const Text('RELATIONS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.onSurfaceVariant)),
+              const Text(
+                'RELATIONS',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(height: 12),
               Consumer<PropertiesProvider>(
                 builder: (context, provider, _) => EntitySelector<Property>(
                   label: 'Property',
-                  selectedValue: _selectedPropertyId != null 
-                    ? provider.properties.where((p) => p.id == _selectedPropertyId).firstOrNull 
-                    : null,
+                  selectedValue: _selectedPropertyId != null
+                      ? provider.properties
+                            .where((p) => p.id == _selectedPropertyId)
+                            .firstOrNull
+                      : null,
                   displayLabel: (p) => p.title,
                   displaySubtitle: (p) => p.address,
                   items: provider.properties,
@@ -221,9 +282,11 @@ class _DealFormScreenState extends State<DealFormScreen> {
               Consumer<ContactsProvider>(
                 builder: (context, provider, _) => EntitySelector<Contact>(
                   label: 'Contact',
-                  selectedValue: _selectedContactId != null 
-                    ? provider.contacts.where((c) => c.id == _selectedContactId).firstOrNull 
-                    : null,
+                  selectedValue: _selectedContactId != null
+                      ? provider.contacts
+                            .where((c) => c.id == _selectedContactId)
+                            .firstOrNull
+                      : null,
                   displayLabel: (c) => c.fullName,
                   displaySubtitle: (c) => c.email ?? c.phone,
                   items: provider.contacts,
@@ -237,9 +300,11 @@ class _DealFormScreenState extends State<DealFormScreen> {
               Consumer<LeadsProvider>(
                 builder: (context, provider, _) => EntitySelector<Lead>(
                   label: 'Lead (Optional)',
-                  selectedValue: _selectedLeadId != null 
-                    ? provider.leads.where((l) => l.id == _selectedLeadId).firstOrNull 
-                    : null,
+                  selectedValue: _selectedLeadId != null
+                      ? provider.leads
+                            .where((l) => l.id == _selectedLeadId)
+                            .firstOrNull
+                      : null,
                   displayLabel: (l) => l.fullName,
                   displaySubtitle: (l) => l.email ?? l.phone ?? '',
                   items: provider.leads,
@@ -250,7 +315,14 @@ class _DealFormScreenState extends State<DealFormScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text('FINANCIALS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.onSurfaceVariant)),
+              const Text(
+                'FINANCIALS',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(height: 12),
               CustomTextField(
                 label: 'Deal Value',

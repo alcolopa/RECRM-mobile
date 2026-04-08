@@ -16,8 +16,11 @@ class DealDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final dealsProvider = context.watch<DealsProvider>();
     final auth = context.watch<AuthProvider>();
-    
-    final deal = dealsProvider.deals.firstWhere((d) => d.id == dealId, orElse: () => throw Exception('Deal not found'));
+
+    final deal = dealsProvider.deals.firstWhere(
+      (d) => d.id == dealId,
+      orElse: () => throw Exception('Deal not found'),
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -30,12 +33,18 @@ class DealDetailScreen extends StatelessWidget {
               icon: const Icon(LucideIcons.edit2, size: 20),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DealFormScreen(deal: deal)),
+                MaterialPageRoute(
+                  builder: (context) => DealFormScreen(deal: deal),
+                ),
               ),
             ),
           if (auth.hasPermission('DEALS_DELETE'))
             IconButton(
-              icon: const Icon(LucideIcons.trash2, size: 20, color: AppTheme.errorColor),
+              icon: const Icon(
+                LucideIcons.trash2,
+                size: 20,
+                color: AppTheme.errorColor,
+              ),
               onPressed: () => _confirmDelete(context, auth, dealsProvider),
             ),
         ],
@@ -50,15 +59,31 @@ class DealDetailScreen extends StatelessWidget {
             _buildFinancialSection(context, deal),
             const SizedBox(height: 24),
             _buildInfoSection(context, 'Relationships', [
-              _buildInfoItem(LucideIcons.building, 'Property', deal.propertyId ?? 'N/A'),
-              _buildInfoItem(LucideIcons.users, 'Contact', deal.contactId ?? 'N/A'),
+              _buildInfoItem(
+                LucideIcons.building,
+                'Property',
+                deal.propertyId ?? 'N/A',
+              ),
+              _buildInfoItem(
+                LucideIcons.users,
+                'Contact',
+                deal.contactId ?? 'N/A',
+              ),
               if (deal.leadId != null)
                 _buildInfoItem(LucideIcons.target, 'Lead', deal.leadId!),
             ]),
             const SizedBox(height: 16),
             _buildInfoSection(context, 'Assignment', [
-              _buildInfoItem(LucideIcons.user, 'Assigned To', deal.assignedUserId ?? 'Unassigned'),
-              _buildInfoItem(LucideIcons.calendar, 'Created', '${deal.createdAt.day}/${deal.createdAt.month}/${deal.createdAt.year}'),
+              _buildInfoItem(
+                LucideIcons.user,
+                'Assigned To',
+                deal.assignedUserId ?? 'Unassigned',
+              ),
+              _buildInfoItem(
+                LucideIcons.calendar,
+                'Created',
+                '${deal.createdAt.day}/${deal.createdAt.month}/${deal.createdAt.year}',
+              ),
             ]),
             const SizedBox(height: 32),
           ],
@@ -87,7 +112,10 @@ class DealDetailScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Deal ID: ${deal.id} • ${deal.type}',
-          style: TextStyle(fontSize: 12, color: AppTheme.onSurfaceVariant.withValues(alpha: 0.6)),
+          style: TextStyle(
+            fontSize: 12,
+            color: AppTheme.onSurfaceVariant.withValues(alpha: 0.6),
+          ),
         ),
       ],
     );
@@ -112,17 +140,38 @@ class DealDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppTheme.primaryColor.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.1)),
+            border: Border.all(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+            ),
           ),
           child: Column(
             children: [
-              _buildMetricRow('Value', '\$${deal.value?.toStringAsFixed(2) ?? "0.00"}', isHighlight: true),
+              _buildMetricRow(
+                'Value',
+                '\$${deal.value?.toStringAsFixed(2) ?? "0.00"}',
+                isHighlight: true,
+              ),
               const Divider(height: 32),
               Row(
                 children: [
-                  Expanded(child: _buildMetricCol('Property Price', '\$${deal.propertyPrice?.toStringAsFixed(0) ?? "-"}')),
-                  Expanded(child: _buildMetricCol('Buyer Comm', '${deal.buyerCommission ?? "-"}%')),
-                  Expanded(child: _buildMetricCol('Seller Comm', '${deal.sellerCommission ?? "-"}%')),
+                  Expanded(
+                    child: _buildMetricCol(
+                      'Property Price',
+                      '\$${deal.propertyPrice?.toStringAsFixed(0) ?? "-"}',
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildMetricCol(
+                      'Buyer Comm',
+                      '${deal.buyerCommission ?? "-"}%',
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildMetricCol(
+                      'Seller Comm',
+                      '${deal.sellerCommission ?? "-"}%',
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -132,11 +181,21 @@ class DealDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricRow(String label, String value, {bool isHighlight = false}) {
+  Widget _buildMetricRow(
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, color: AppTheme.onSurfaceVariant)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppTheme.onSurfaceVariant,
+          ),
+        ),
         Text(
           value,
           style: TextStyle(
@@ -153,14 +212,27 @@ class DealDetailScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.onSurfaceVariant)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppTheme.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
 
-  Widget _buildInfoSection(BuildContext context, String title, List<Widget> items) {
+  Widget _buildInfoSection(
+    BuildContext context,
+    String title,
+    List<Widget> items,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,7 +250,9 @@ class DealDetailScreen extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1)),
+            side: BorderSide(
+              color: AppTheme.onSurfaceVariant.withValues(alpha: 0.1),
+            ),
           ),
           color: AppTheme.surfaceLift,
           child: Padding(
@@ -197,25 +271,46 @@ class DealDetailScreen extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: AppTheme.onSurfaceVariant),
           const SizedBox(width: 12),
-          Text(label, style: const TextStyle(fontSize: 14, color: AppTheme.onSurfaceVariant)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, AuthProvider auth, DealsProvider provider) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    AuthProvider auth,
+    DealsProvider provider,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this deal? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to delete this deal? This action cannot be undone.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('CANCEL')),
           TextButton(
-            onPressed: () => Navigator.pop(context, true), 
-            child: const Text('DELETE', style: TextStyle(color: AppTheme.errorColor)),
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'DELETE',
+              style: TextStyle(color: AppTheme.errorColor),
+            ),
           ),
         ],
       ),
@@ -226,11 +321,15 @@ class DealDetailScreen extends StatelessWidget {
         await provider.deleteDeal(dealId, auth.currentOrganizationId!);
         if (context.mounted) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Deal deleted')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Deal deleted')));
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting deal: $e')));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error deleting deal: $e')));
         }
       }
     }
